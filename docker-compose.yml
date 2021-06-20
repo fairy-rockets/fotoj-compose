@@ -1,0 +1,98 @@
+---
+version: '3.9'
+services:
+  web:
+    build:
+      context: './images/nginx'
+    image: 'fotoj_nginx'
+    hostname: 'fotoj_web'
+    container_name: 'fotoj_web'
+    restart: always
+    volumes:
+      - './images/pixelfed/src:/var/www'
+      - './var/pixelfed/storage/app/public:/var/www/public/storage'
+    networks:
+      - planet-link
+      - fotoj-link
+    expose:
+      - '80'
+    depends_on:
+      - app
+
+  app:
+    # Comment to use dockerhub image
+    build:
+      context: './images/pixelfed/src'
+      dockerfile: 'contrib/docker/Dockerfile.fpm'
+    image: 'fotoj_pixelfed'
+    hostname: 'fotoj_app'
+    container_name: 'fotoj_app'
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./var/pixelfed/storage:/var/www/storage
+      - ./var/pixelfed/bootstrap/cache:/var/www/bootstrap/cache
+    networks:
+      - planet-link
+      - fotoj-link
+    expose:
+      - '9000'
+    depends_on:
+      - db
+      - redis
+
+  worker:
+    build:
+      context: './images/pixelfed/src'
+      dockerfile: 'contrib/docker/Dockerfile.fpm'
+    image: 'fotoj_pixelfed'
+    hostname: 'fotoj_worker'
+    container_name: 'fotoj_worker'
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./var/pixelfed/storage:/var/www/storage
+      - ./var/pixelfed/bootstrap/cache:/var/www/bootstrap/cache
+    networks:
+      - planet-link
+      - fotoj-link
+    command: gosu www-data php artisan horizon
+    depends_on:
+      - db
+      - redis
+
+## DB and Cache
+  db:
+    image: mysql:8.0
+    hostname: 'fotoj_db'
+    container_name: 'fotoj_db'
+    restart: always
+    networks:
+      - fotoj-link
+    command: '--default-authentication-plugin=mysql_native_password'
+    env_file:
+      - .env
+    volumes:
+      - './var/mysql:/var/lib/mysql'
+
+  redis:
+    image: redis:5-alpine
+    hostname: 'fotoj_redis'
+    container_name: 'fotoj_redis'
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - './var/redis:/data'
+    networks:
+      - fotoj-link
+
+networks:
+  default:
+    driver: 'null'
+  fotoj-link:
+    internal: true
+  planet-link:
+    external: true
