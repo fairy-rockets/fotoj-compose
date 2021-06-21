@@ -16,4 +16,5 @@ make up
 
 # LICENSE
 
-BSD
+BSD-2-Clause
+
