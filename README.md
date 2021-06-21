@@ -27,7 +27,9 @@ fotoj_web      /docker-entrypoint.sh ngin ...   Up      80/tcp
 fotoj_worker   docker-php-entrypoint gosu ...   Up      9000/tcp
 ```
 
-Then you can setup reverse proxy to connect it.
+Then follow [the document](https://docs.pixelfed.org/) to have one-time setup tasks done.
+
+Finally, you can setup reverse proxy to connect it!
 
 ```
 # I'm using nginx-upstream-dynamic-servers module to resolve servername dynamically.
