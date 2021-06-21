@@ -64,5 +64,4 @@ server {
 
 # LICENSE
 
-BSD-2-Clause
-
+MIT
