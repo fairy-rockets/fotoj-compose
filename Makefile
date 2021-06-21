@@ -42,7 +42,7 @@ top:
 
 .PHONY: backup
 backup:
-	sudo bash _helpers/backup.sh $(shell id -g) $(shell id -u) var
+	sudo bash _helpers/backup.sh $(shell id -g) $(shell id -u) var .env
 
 # -----------------------------------------------------------------------------
 # https://makefiletutorial.com/#automatic-variables
